@@ -25,5 +25,5 @@ public abstract class MixinEncasedFanTileEntity extends GeneratingKineticTileEnt
         return true;
         //return this.world.getBlockState(this.pos.down()).getBlock().isIn(AllTags.AllBlockTags.FAN_HEATERS.tag);
     }
-
+    //it is really useless
 }
