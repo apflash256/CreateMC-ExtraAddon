@@ -3,11 +3,12 @@ package com.sturdycobble.createrevision.contents.heat.transfer;
 import javax.annotation.Nullable;
 
 import com.simibubi.create.foundation.utility.Iterate;
+import com.sturdycobble.createrevision.contents.heat.CapabilityHeat;
+import com.sturdycobble.createrevision.contents.heat.IHeatableTileEntity;
 import com.sturdycobble.createrevision.init.ModBlocks;
 
 import net.minecraft.block.Block;
 import net.minecraft.block.BlockState;
-import net.minecraft.block.Blocks;
 import net.minecraft.block.IWaterLoggable;
 import net.minecraft.block.SixWayBlock;
 import net.minecraft.fluid.Fluids;
@@ -33,17 +34,19 @@ public class HeatPipeBlock extends SixWayBlock implements IWaterLoggable {
 	}
 	
 	public static boolean isPipe(BlockState state) {
-        return state.getBlock() instanceof HeatPipeBlock;
+        return state.getBlock() == ModBlocks.HEAT_PIPE.get();
     }
 	
-	public static boolean isSource(BlockState state) {
-        return (state.getBlock() == Blocks.MAGMA_BLOCK ||
-        		state.getBlock() == Blocks.PACKED_ICE || 
-        		state.getBlock() == ModBlocks.FRICTION_HEATER.get());
+	public static boolean isSource(ILightReader world, BlockPos pos, BlockState state, Direction direction) {
+		boolean hasHeatCapability = false;
+		if (world.getTileEntity(pos) instanceof IHeatableTileEntity)
+			hasHeatCapability = world.getTileEntity(pos)
+					.getCapability(CapabilityHeat.HEAT_CAPABILITY, direction).isPresent();
+		return hasHeatCapability && !(isPipe(state));
     }
 
-    public static boolean canConnectTo(ILightReader world, BlockPos pos, BlockState neighbor, Direction blockFace) {
-        if (isPipe(neighbor) || isSource(neighbor))
+    public static boolean canConnectTo(ILightReader world, BlockPos pos, BlockState neighbor, Direction blockFacing) {
+        if (isPipe(neighbor) || isSource(world, pos, neighbor, blockFacing))
             return true;
         return false;
     }
